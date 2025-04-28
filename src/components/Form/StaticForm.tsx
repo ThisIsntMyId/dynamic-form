@@ -18,6 +18,10 @@ interface FormErrorMessages {
   [key: string]: string;
 }
 
+interface StaticFormProps {
+  initialUserState?: UserState;
+}
+
 const formRules = {
   'basicInfo.firstName': ['required'],
   'basicInfo.lastName': ['required'],
@@ -68,10 +72,9 @@ const countryOptions = [
   'Saudi Arabia', 'Switzerland'
 ];
 
-const StaticForm: React.FC = () => {
-  const [userState, setUserState] = useState<UserState | null>(null);
+const StaticForm: React.FC<StaticFormProps> = ({ initialUserState }) => {
+  const [userState, setUserState] = useState<UserState | null>(initialUserState || null);
   const [formError, setFormError] = useState<Record<string, string> | null>(null);
-  console.log("🚀 ~ formError:", formError)
 
   const updateUserState = (path: string, value: any) => {
     const [group, field] = path.split('.');

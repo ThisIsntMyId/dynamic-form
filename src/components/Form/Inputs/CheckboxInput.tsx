@@ -21,7 +21,6 @@ const CheckboxInput: React.FC<CheckboxInputProps> = ({
   label,
   hint
 }) => {
-  console.log("🚀 ~ error:", error)
   const handleChange = (option: string) => {
     const currentValue = value || [];
     const newValue = currentValue.includes(option)
