@@ -30,7 +30,6 @@ const LS_PAGE_CODE = 'intakeForm_currentPageCode';
 export const DynamicForm: React.FC<DynamicFormProps> = ({
   formConfig,
   userResponse,
-  currentStep,
   onStepChange,
   onSubmit
 }) => {
@@ -49,7 +48,7 @@ export const DynamicForm: React.FC<DynamicFormProps> = ({
 
   // Helper function to replace macros in content
   const replaceMacros = (content: string, data: Record<string, Record<string, any>>): string => {
-    return content.replace(/\[#([^.]+)\.([^\]]+)\]/g, (match, pageCode, questionCode) => {
+    return content.replace(/\[#([^.]+)\.([^\]]+)\]/g, (_, pageCode, questionCode) => {
       return data[pageCode]?.[questionCode] || '';
     });
   };
@@ -227,17 +226,6 @@ export const DynamicForm: React.FC<DynamicFormProps> = ({
     }
   };
 
-  const handleSubmit = () => {
-    if (validatePage()) {
-      if (formConfig.showReview) {
-        navigateToStep(REVIEW_PAGE);
-      } else {
-        handleFinalSubmit(localUserResponse);
-        navigateToStep(COMPLETE_PAGE);
-      }
-    }
-  };
-
   // Question Rendering
   const shouldShowFollowup = (question: Question, value: any): boolean => {
     if (!question.showFollowupWhen || !question.followup_questions) return false;
@@ -297,7 +285,7 @@ export const DynamicForm: React.FC<DynamicFormProps> = ({
         case 'checkbox':
           return <CheckboxInput {...commonProps} options={question.options as string[]} />;
         case 'document':
-          return <DocumentInput {...commonProps} filetype={question.filetype} maxFileSize={question.maxFileSize} />;
+          return <DocumentInput {...commonProps} filetype={question.filetype} max={Number(question.max)} />;
         case 'combobox':
           return <ComboboxInput {...commonProps} options={question.options as string[]} />;
         default:

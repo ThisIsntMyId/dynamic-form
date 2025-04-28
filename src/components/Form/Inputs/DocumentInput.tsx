@@ -9,6 +9,7 @@ interface DocumentInputProps {
   label?: string;
   filetype?: string[];
   hint?: string;
+  max?: number;
 }
 
 const DocumentInput: React.FC<DocumentInputProps> = ({
@@ -19,13 +20,19 @@ const DocumentInput: React.FC<DocumentInputProps> = ({
   error,
   label,
   filetype,
-  hint
+  hint,
+  max
 }) => {
   const [fileName, setFileName] = useState('');
+  const [internalError, setInternalError] = useState(error);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
       const file = e.target.files[0];
+      if (max && file.size > max) {
+        setInternalError(`File size must be less than ${max} bytes`);
+        return;
+      }
       onChange(file);
       setFileName(file.name);
     } else {
@@ -56,7 +63,7 @@ const DocumentInput: React.FC<DocumentInputProps> = ({
         </div>
       )}
       {hint && <p className="mt-2 text-sm text-gray-500">{hint}</p>}
-      {error && <p className="mt-2 text-sm text-red-500">{error}</p>}
+      {internalError && <p className="mt-2 text-sm text-red-500">{internalError}</p>}
     </div>
   );
 };
