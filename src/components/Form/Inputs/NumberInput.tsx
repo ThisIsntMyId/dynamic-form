@@ -3,8 +3,8 @@ import React from 'react';
 interface NumberInputProps {
   name: string;
   code: string;
-  value: string;
-  onChange: (value: string) => void;
+  value: string | null;
+  onChange: (value: string | null) => void;
   placeholder?: string;
   required?: boolean;
   max?: number;
@@ -50,8 +50,8 @@ const NumberInput: React.FC<NumberInputProps> = ({
           type="number"
           name={name}
           id={code}
-          value={value}
-          onChange={(e) => onChange(e.target.value)}
+          value={value || ''}
+          onChange={(e) => onChange(e.target.value || null)}
           placeholder={placeholder}
           required={required}
           max={max}

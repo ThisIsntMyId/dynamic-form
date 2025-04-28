@@ -3,8 +3,8 @@ import React from 'react';
 interface EmailInputProps {
   name: string;
   code: string;
-  value: string;
-  onChange: (value: string) => void;
+  value: string | null;
+  onChange: (value: string | null) => void;
   placeholder?: string;
   required?: boolean;
   pattern?: string;
@@ -36,8 +36,8 @@ const EmailInput: React.FC<EmailInputProps> = ({
         type="email"
         name={name}
         id={code}
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
+        value={value || ''}
+        onChange={(e) => onChange(e.target.value || null)}
         placeholder={placeholder}
         required={required}
         pattern={pattern}

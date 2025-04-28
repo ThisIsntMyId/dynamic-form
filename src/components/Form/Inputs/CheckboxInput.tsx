@@ -3,8 +3,8 @@ import React from 'react';
 interface CheckboxInputProps {
   name: string;
   code: string;
-  value: string[];
-  onChange: (value: string[]) => void;
+  value: string[] | null;
+  onChange: (value: string[] | null) => void;
   options: string[];
   required?: boolean;
   error?: string;
@@ -14,20 +14,20 @@ interface CheckboxInputProps {
 
 const CheckboxInput: React.FC<CheckboxInputProps> = ({
   name,
-  code,
   value,
   onChange,
   options,
-  required = false,
   error,
   label,
   hint
 }) => {
+  console.log("🚀 ~ error:", error)
   const handleChange = (option: string) => {
-    const newValue = value.includes(option)
-      ? value.filter(v => v !== option)
-      : [...value, option];
-    onChange(newValue);
+    const currentValue = value || [];
+    const newValue = currentValue.includes(option)
+      ? currentValue.filter(v => v !== option)
+      : [...currentValue, option];
+    onChange(newValue.length > 0 ? newValue : null);
   };
 
   return (
@@ -39,11 +39,12 @@ const CheckboxInput: React.FC<CheckboxInputProps> = ({
       )}
       <div className="flex flex-col gap-3">
         {options.map((option) => {
-          const checked = value.includes(option);
+          const checked = (value || []).includes(option);
           return (
             <button
               key={option}
               type="button"
+              name={name}
               onClick={() => handleChange(option)}
               className={`w-full flex items-center px-6 py-4 text-lg border transition-all
                 ${checked ? 'border-black bg-white' : 'border-gray-300 bg-white hover:border-teal-400'}

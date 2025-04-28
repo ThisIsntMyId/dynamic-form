@@ -1,8 +1,9 @@
 import React from 'react';
 
 interface RadioInputProps {
-  value: string;
-  onChange: (value: string) => void;
+  name: string;
+  value: string | null;
+  onChange: (value: string | null) => void;
   options: string[];
   error?: string;
   label?: string;
@@ -10,6 +11,7 @@ interface RadioInputProps {
 }
 
 const RadioInput: React.FC<RadioInputProps> = ({
+  name,
   value,
   onChange,
   options,
@@ -29,6 +31,7 @@ const RadioInput: React.FC<RadioInputProps> = ({
           <button
             key={option}
             type="button"
+            name={name}
             onClick={() => onChange(option)}
             className={`w-full flex items-center px-6 py-4 text-lg border transition-all
               ${value === option ? 'border-black bg-white' : 'border-gray-300 bg-white hover:border-teal-400'}

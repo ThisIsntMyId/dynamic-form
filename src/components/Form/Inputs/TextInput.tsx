@@ -3,8 +3,8 @@ import React from 'react';
 interface TextInputProps {
   name: string;
   code: string;
-  value: string;
-  onChange: (value: string) => void;
+  value: string | null;
+  onChange: (value: string | null) => void;
   placeholder?: string;
   required?: boolean;
   max?: number;
@@ -48,8 +48,8 @@ const TextInput: React.FC<TextInputProps> = ({
           type="text"
           name={name}
           id={code}
-          value={value}
-          onChange={(e) => onChange(e.target.value)}
+          value={value || ''}
+          onChange={(e) => onChange(e.target.value || null)}
           placeholder={placeholder}
           required={required}
           maxLength={max}

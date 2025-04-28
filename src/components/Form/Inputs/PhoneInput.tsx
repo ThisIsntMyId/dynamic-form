@@ -3,8 +3,8 @@ import React from 'react';
 interface PhoneInputProps {
   name: string;
   code: string;
-  value: string;
-  onChange: (value: string) => void;
+  value: string | null;
+  onChange: (value: string | null) => void;
   placeholder?: string;
   required?: boolean;
   pattern?: string;
@@ -58,12 +58,12 @@ const PhoneInput: React.FC<PhoneInputProps> = ({
 }) => {
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const unmaskedValue = getUnmaskedValue(e.target.value);
-    const e164Value = unmaskedValue ? `+${prefix}${unmaskedValue}` : '';
+    const e164Value = unmaskedValue ? `+${prefix}${unmaskedValue}` : null;
     onChange(e164Value);
   };
 
   // Convert E.164 format to display format
-  const getDisplayValue = (e164Value: string): string => {
+  const getDisplayValue = (e164Value: string | null): string => {
     if (!e164Value) return '';
     // Remove prefix and any non-digit characters
     const cleaned = e164Value.replace(`+${prefix}`, '').replace(/\D/g, '');

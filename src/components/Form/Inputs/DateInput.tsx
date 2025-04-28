@@ -3,8 +3,8 @@ import React from 'react';
 interface DateInputProps {
   name: string;
   code: string;
-  value: string;
-  onChange: (value: string) => void;
+  value: string | null;
+  onChange: (value: string | null) => void;
   placeholder?: string;
   required?: boolean;
   min?: string;
@@ -31,6 +31,8 @@ const DateInput: React.FC<DateInputProps> = ({
     const date = new Date(e.target.value);
     if (!isNaN(date.getTime())) {
       onChange(e.target.value);
+    } else {
+      onChange(null);
     }
   };
 
@@ -61,7 +63,7 @@ const DateInput: React.FC<DateInputProps> = ({
         type="date"
         name={name}
         id={code}
-        value={value}
+        value={value || ''}
         onChange={handleChange}
         placeholder={placeholder}
         required={required}
