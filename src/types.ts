@@ -69,6 +69,21 @@ export type IntakeFormConfig = {
   type: string                    // Form type identifier
   tag: string                     // Form tag identifier
   pages: Page[]
+  
+  // Preview settings
+  showPreview?: boolean
+  previewContent?: string
+  
+  // Review settings
+  showReview?: boolean
+  reviewContent?: string
+  formSubmittedContent?: string
+  formSubmitBackLink?: string
+  
+  // Consent settings
+  requireConsent?: boolean
+  consentContent?: string
+  consentSignUrl?: string
 }
 
 // ===== FORM RESPONSE TYPE =====

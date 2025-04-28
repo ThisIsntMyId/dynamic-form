@@ -10,6 +10,60 @@ const sampleFormConfig: IntakeFormConfig = {
   formNotes: "All fields marked with * are required",
   type: "patient",
   tag: "intake",
+
+  // Preview settings
+  showPreview: true,
+  previewContent: `
+    <h2>Welcome to the Patient Intake Form</h2>
+    <p>This form will help us gather important information about your medical history and current health status.</p>
+    <p>Please have the following information ready:</p>
+    <ul>
+      <li>Personal identification</li>
+      <li>Insurance information</li>
+      <li>List of current medications</li>
+      <li>Medical history details</li>
+    </ul>
+    <p>The form should take approximately 10-15 minutes to complete.</p>
+  `,
+
+  // Review settings
+  showReview: true,
+  reviewContent: `
+    <h2>Review Your Information</h2>
+    <p>Please review all the information you've provided before submitting.</p>
+    
+    <h3>Basic Information</h3>
+    <p><strong>Name:</strong> [#basicInfo.firstName] [#basicInfo.lastName]</p>
+    <p><strong>Email:</strong> [#basicInfo.email]</p>
+    <p><strong>Phone:</strong> [#basicInfo.phone]</p>
+    
+    <h3>Medical History</h3>
+    <p><strong>Allergies:</strong> [#medicalHistory.allergies]</p>
+    <p><strong>Current Medications:</strong> [#medicalHistory.medications]</p>
+    <p><strong>Medical Conditions:</strong> [#medicalHistory.conditions]</p>
+    
+    <h3>Insurance Information</h3>
+    <p><strong>Provider:</strong> [#insurance.provider]</p>
+    <p><strong>Policy Number:</strong> [#insurance.policyNumber]</p>
+  `,
+  formSubmittedContent: `
+    <h2>Thank You!</h2>
+    <p>Your form has been successfully submitted.</p>
+    <p>We will review your information and contact you if we need any additional details.</p>
+    <p>You can expect to hear from us within 24-48 hours.</p>
+  `,
+  formSubmitBackLink: "/",
+
+  // Consent settings
+  requireConsent: true,
+  consentContent: `
+    I agree to the <a href="/terms" target="_blank">Terms of Service</a> and 
+    <a href="/privacy" target="_blank">Privacy Policy</a>. I understand that my 
+    information will be used for medical purposes and will be kept confidential 
+    in accordance with HIPAA regulations.
+  `,
+  consentSignUrl: "https://dummyimage.com/800x150.png/fff/000&text=#basicInfo.firstName+#basicInfo.lastName",
+
   pages: [
     {
       id: "1",
