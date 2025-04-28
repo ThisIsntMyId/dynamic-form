@@ -14,51 +14,48 @@ const sampleFormConfig: IntakeFormConfig = {
   // Preview settings
   showPreview: true,
   previewContent: `
-    <h2>Welcome to the Patient Intake Form</h2>
-    <p>This form will help us gather important information about your medical history and current health status.</p>
-    <p>Please have the following information ready:</p>
-    <ul>
-      <li>Personal identification</li>
-      <li>Insurance information</li>
-      <li>List of current medications</li>
-      <li>Medical history details</li>
+    <h2 class="text-3xl font-bold mb-4 flex items-center gap-2">👋 Welcome to the Patient Intake Form</h2>
+    <p class="mb-2 text-lg">This form will help us gather important information about your medical history and current health status.</p>
+    <p class="mb-2 text-lg">Please have the following information ready:</p>
+    <ul class="list-disc list-inside mb-4 text-base">
+      <li>🪪 Personal identification</li>
+      <li>💳 Insurance information</li>
+      <li>💊 List of current medications</li>
+      <li>🩺 Medical history details</li>
     </ul>
-    <p>The form should take approximately 10-15 minutes to complete.</p>
+    <p class="text-blue-700 font-semibold">⏱️ The form should take approximately 10-15 minutes to complete.</p>
   `,
 
   // Review settings
   showReview: true,
   reviewContent: `
-    <h2>Review Your Information</h2>
-    <p>Please review all the information you've provided before submitting.</p>
-    
-    <h3>Basic Information</h3>
+    <h2 class="text-2xl font-bold mb-4">🔍 Review Your Information</h2>
+    <p class="mb-4">Please review all the information you've provided before submitting.</p>
+    <h3 class="text-xl font-semibold mt-4 mb-2">👤 Basic Information</h3>
     <p><strong>Name:</strong> [#basicInfo.firstName] [#basicInfo.lastName]</p>
     <p><strong>Email:</strong> [#basicInfo.email]</p>
     <p><strong>Phone:</strong> [#basicInfo.phone]</p>
-    
-    <h3>Medical History</h3>
+    <h3 class="text-xl font-semibold mt-4 mb-2">🩺 Medical History</h3>
     <p><strong>Allergies:</strong> [#medicalHistory.allergies]</p>
     <p><strong>Current Medications:</strong> [#medicalHistory.medications]</p>
     <p><strong>Medical Conditions:</strong> [#medicalHistory.conditions]</p>
-    
-    <h3>Insurance Information</h3>
+    <h3 class="text-xl font-semibold mt-4 mb-2">💼 Insurance Information</h3>
     <p><strong>Provider:</strong> [#insurance.provider]</p>
     <p><strong>Policy Number:</strong> [#insurance.policyNumber]</p>
   `,
   formSubmittedContent: `
-    <h2>Thank You!</h2>
-    <p>Your form has been successfully submitted.</p>
-    <p>We will review your information and contact you if we need any additional details.</p>
-    <p>You can expect to hear from us within 24-48 hours.</p>
+    <h2 class="text-2xl font-bold mb-4 text-green-700">✅ Thank You!</h2>
+    <p class="mb-2">Your form has been successfully submitted. 🎉</p>
+    <p class="mb-2">We will review your information and contact you if we need any additional details.</p>
+    <p class="mb-2">You can expect to hear from us within <span class="font-semibold">24-48 hours</span>.</p>
   `,
   formSubmitBackLink: "/",
 
   // Consent settings
   requireConsent: true,
   consentContent: `
-    I agree to the <a href="/terms" target="_blank">Terms of Service</a> and 
-    <a href="/privacy" target="_blank">Privacy Policy</a>. I understand that my 
+    I agree to the <a class="text-blue-700" href="/terms" target="_blank">Terms of Service</a> and 
+    <a class="text-blue-700" href="/privacy" target="_blank">Privacy Policy</a>. I understand that my 
     information will be used for medical purposes and will be kept confidential 
     in accordance with HIPAA regulations.
   `,
@@ -272,7 +269,7 @@ const sampleFormConfig: IntakeFormConfig = {
       title: "Insurance Information",
       desc: "Please provide your insurance details",
       order: 3,
-      columns: 2,
+      columns: 1,
       questions: [
         {
           id: "11",
@@ -336,15 +333,17 @@ function RouteComponent() {
   }
 
   return (
-    <div className="max-w-4xl mx-auto p-6">
-      <p>Current Step: {currentStep}</p>
-      <DynamicForm
-        formConfig={sampleFormConfig}
-        userResponse={userResponse}
-        currentStep={currentStep}
-        onStepChange={handleStepChange}
-        onSubmit={handleSubmit}
-      />
+    <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center py-8">
+      <div className="w-full max-w-4xl">
+        <p className="text-center text-gray-500 mb-4">Current Step: {currentStep}</p>
+        <DynamicForm
+          formConfig={sampleFormConfig}
+          userResponse={userResponse}
+          currentStep={currentStep}
+          onStepChange={handleStepChange}
+          onSubmit={handleSubmit}
+        />
+      </div>
     </div>
   )
 }

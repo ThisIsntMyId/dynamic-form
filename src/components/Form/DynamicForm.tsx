@@ -275,19 +275,25 @@ export const DynamicForm: React.FC<DynamicFormProps> = ({
   // Preview Screen
   if (currentPageCode === PREVIEW_PAGE) {
     return (
-      <div className="preview-screen">
-        <div className="preview-content" dangerouslySetInnerHTML={{ __html: formConfig.previewContent || '' }} />
-        <button 
-          onClick={() => {
-            const url = new URL(window.location.href);
-            url.searchParams.set('page', formConfig.pages[0].code);
-            window.history.pushState({}, '', url);
-            onStepChange?.(formConfig.pages[0].code, localUserResponse);
-          }}
-          className="btn-start"
-        >
-          Start Form
-        </button>
+      <div className="flex justify-center items-center min-h-[60vh]">
+        <div className="preview-screen bg-white rounded-lg shadow-lg p-8 max-w-xl w-full">
+          {/* JSON dump for debugging */}
+          <pre className="bg-gray-100 text-xs p-4 rounded mb-4 overflow-x-auto">
+            {JSON.stringify(localUserResponse, null, 2)}
+          </pre>
+          <div className="preview-content mb-8" dangerouslySetInnerHTML={{ __html: formConfig.previewContent || '' }} />
+          <button 
+            onClick={() => {
+              const url = new URL(window.location.href);
+              url.searchParams.set('page', formConfig.pages[0].code);
+              window.history.pushState({}, '', url);
+              onStepChange?.(formConfig.pages[0].code, localUserResponse);
+            }}
+            className="btn-start bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-6 rounded shadow transition"
+          >
+            Start Form
+          </button>
+        </div>
       </div>
     );
   }
@@ -296,49 +302,61 @@ export const DynamicForm: React.FC<DynamicFormProps> = ({
   if (currentPageCode === REVIEW_PAGE) {
     const replacedReviewContent = replaceMacros(formConfig.reviewContent || '', localUserResponse);
     const replacedConsentSignUrl = formConfig.consentSignUrl ? replaceMacros(formConfig.consentSignUrl, localUserResponse) : '';
+    const consentCheckboxRef = React.useRef<HTMLInputElement>(null);
     return (
-      <div className="review-screen">
-        <div className="review-content" dangerouslySetInnerHTML={{ __html: replacedReviewContent }} />
-        {formConfig.requireConsent && (
-          <div className="consent-section">
-            <label className="consent-checkbox">
-              <input
-                type="checkbox"
-                checked={consentChecked}
-                onChange={(e) => {
-                  setConsentChecked(e.target.checked);
-                  setConsentError('');
-                }}
-              />
-              <span dangerouslySetInnerHTML={{ __html: formConfig.consentContent || '' }} />
-            </label>
-            {replacedConsentSignUrl && (
-              <img src={replacedConsentSignUrl} alt="Consent Signature" className="consent-signature" />
-            )}
-            {consentError && <div className="text-red-500 mt-2">{consentError}</div>}
+      <div className="flex justify-center items-center min-h-[60vh]">
+        <div className="review-screen bg-white rounded-lg shadow-lg p-8 max-w-xl w-full">
+          {/* JSON dump for debugging */}
+          <pre className="bg-gray-100 text-xs p-4 rounded mb-4 overflow-x-auto">
+            {JSON.stringify(localUserResponse, null, 2)}
+          </pre>
+          <div className="review-content mb-8 prose" dangerouslySetInnerHTML={{ __html: replacedReviewContent }} />
+          {formConfig.requireConsent && (
+            <div className="consent-section mb-6">
+              <label className="consent-checkbox flex items-center gap-2">
+                <input
+                  ref={consentCheckboxRef}
+                  type="checkbox"
+                  checked={consentChecked}
+                  onChange={(e) => {
+                    setConsentChecked(e.target.checked);
+                    setConsentError('');
+                  }}
+                />
+                <span dangerouslySetInnerHTML={{ __html: formConfig.consentContent || '' }} />
+              </label>
+              {consentError && (
+                <div className="text-red-500 mt-1 font-semibold" role="alert">
+                  {consentError}
+                </div>
+              )}
+              {replacedConsentSignUrl && (
+                <img src={replacedConsentSignUrl} alt="Consent Signature" className="consent-signature mt-4 rounded border" />
+              )}
+            </div>
+          )}
+          <div className="review-actions flex gap-4 justify-end">
+            <button 
+              onClick={() => navigateToStep(formConfig.pages[formConfig.pages.length - 1].code)}
+              className="btn-back bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold py-2 px-6 rounded shadow transition"
+            >
+              Back
+            </button>
+            <button 
+              onClick={() => {
+                if (formConfig.requireConsent && !consentChecked) {
+                  setConsentError('You must agree to the consent before submitting.');
+                  consentCheckboxRef.current?.focus();
+                  return;
+                }
+                onSubmit(localUserResponse);
+                navigateToStep(COMPLETE_PAGE);
+              }}
+              className="btn-submit bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-6 rounded shadow transition"
+            >
+              Submit
+            </button>
           </div>
-        )}
-        <div className="review-actions">
-          <button 
-            onClick={() => navigateToStep(formConfig.pages[formConfig.pages.length - 1].code)}
-            className="btn-back"
-          >
-            Back
-          </button>
-          <button 
-            onClick={() => {
-              if (formConfig.requireConsent && !consentChecked) {
-                setConsentError('You must agree to the consent before submitting.');
-                return;
-              }
-              onSubmit(localUserResponse);
-              navigateToStep(COMPLETE_PAGE);
-            }}
-            className="btn-submit"
-            disabled={formConfig.requireConsent && !consentChecked}
-          >
-            Submit
-          </button>
         </div>
       </div>
     );
@@ -347,13 +365,19 @@ export const DynamicForm: React.FC<DynamicFormProps> = ({
   // Complete/Thank You Screen
   if (currentPageCode === COMPLETE_PAGE) {
     return (
-      <div className="submitted-screen">
-        <div className="submitted-content" dangerouslySetInnerHTML={{ __html: formConfig.formSubmittedContent || '' }} />
-        {formConfig.formSubmitBackLink && (
-          <a href={formConfig.formSubmitBackLink} className="btn-back">
-            Back
-          </a>
-        )}
+      <div className="flex justify-center items-center min-h-[60vh]">
+        <div className="submitted-screen bg-white rounded-lg shadow-lg p-8 max-w-xl w-full text-center">
+          {/* JSON dump for debugging */}
+          <pre className="bg-gray-100 text-xs p-4 rounded mb-4 overflow-x-auto">
+            {JSON.stringify(localUserResponse, null, 2)}
+          </pre>
+          <div className="submitted-content mb-8 prose" dangerouslySetInnerHTML={{ __html: formConfig.formSubmittedContent || '' }} />
+          {formConfig.formSubmitBackLink && (
+            <a href={formConfig.formSubmitBackLink} className="btn-back bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold py-2 px-6 rounded shadow transition inline-block">
+              Back
+            </a>
+          )}
+        </div>
       </div>
     );
   }
@@ -365,11 +389,15 @@ export const DynamicForm: React.FC<DynamicFormProps> = ({
 
   return (
     <div className="dynamic-form">
-      <header>
-        <h1>{currentPage.title}</h1>
-        {currentPage.desc && <p>{currentPage.desc}</p>}
+      <header className="mb-6">
+        <h1 className="text-2xl font-bold mb-2">{currentPage.title}</h1>
+        {currentPage.desc && <p className="text-gray-600 mb-2">{currentPage.desc}</p>}
       </header>
-      <div className={`grid grid-cols-${currentPage.columns} gap-4`}>
+      {/* JSON dump for debugging */}
+      <pre className="bg-gray-100 text-xs p-4 rounded mb-4 overflow-x-auto">
+        {JSON.stringify(localUserResponse, null, 2)}
+      </pre>
+      <div className={`grid grid-cols-${currentPage.columns} gap-4 mb-8`}>
         {currentPage.questions.map(question => (
           <div 
             key={question.code}
@@ -380,11 +408,11 @@ export const DynamicForm: React.FC<DynamicFormProps> = ({
         ))}
       </div>
       <footer>
-        <div className="form-actions">
+        <div className="form-actions flex gap-4 justify-end">
           {hasNextPage() && (
             <button 
               onClick={handleNext}
-              className="btn-next"
+              className="btn-next bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-6 rounded shadow transition"
             >
               Next
             </button>
@@ -393,7 +421,7 @@ export const DynamicForm: React.FC<DynamicFormProps> = ({
             formConfig.showReview ? (
               <button 
                 onClick={() => navigateToStep(REVIEW_PAGE)}
-                className="btn-review"
+                className="btn-review bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-6 rounded shadow transition"
               >
                 Review
               </button>
@@ -403,14 +431,14 @@ export const DynamicForm: React.FC<DynamicFormProps> = ({
                   onSubmit(localUserResponse);
                   navigateToStep(COMPLETE_PAGE);
                 }}
-                className="btn-submit"
+                className="btn-submit bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-6 rounded shadow transition"
               >
                 Submit
               </button>
             )
           )}
         </div>
-        {currentPage.footer && <p>{currentPage.footer}</p>}
+        {currentPage.footer && <p className="text-gray-500 mt-4">{currentPage.footer}</p>}
       </footer>
     </div>
   );
