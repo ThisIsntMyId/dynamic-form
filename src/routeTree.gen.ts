@@ -12,6 +12,7 @@
 
 import { Route as rootRoute } from './routes/__root'
 import { Route as StaticFormImport } from './routes/static-form'
+import { Route as DynamicFormImport } from './routes/dynamic-form'
 import { Route as IndexImport } from './routes/index'
 
 // Create/Update Routes
@@ -19,6 +20,12 @@ import { Route as IndexImport } from './routes/index'
 const StaticFormRoute = StaticFormImport.update({
   id: '/static-form',
   path: '/static-form',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const DynamicFormRoute = DynamicFormImport.update({
+  id: '/dynamic-form',
+  path: '/dynamic-form',
   getParentRoute: () => rootRoute,
 } as any)
 
@@ -39,6 +46,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexImport
       parentRoute: typeof rootRoute
     }
+    '/dynamic-form': {
+      id: '/dynamic-form'
+      path: '/dynamic-form'
+      fullPath: '/dynamic-form'
+      preLoaderRoute: typeof DynamicFormImport
+      parentRoute: typeof rootRoute
+    }
     '/static-form': {
       id: '/static-form'
       path: '/static-form'
@@ -53,36 +67,41 @@ declare module '@tanstack/react-router' {
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/dynamic-form': typeof DynamicFormRoute
   '/static-form': typeof StaticFormRoute
 }
 
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/dynamic-form': typeof DynamicFormRoute
   '/static-form': typeof StaticFormRoute
 }
 
 export interface FileRoutesById {
   __root__: typeof rootRoute
   '/': typeof IndexRoute
+  '/dynamic-form': typeof DynamicFormRoute
   '/static-form': typeof StaticFormRoute
 }
 
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/static-form'
+  fullPaths: '/' | '/dynamic-form' | '/static-form'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/static-form'
-  id: '__root__' | '/' | '/static-form'
+  to: '/' | '/dynamic-form' | '/static-form'
+  id: '__root__' | '/' | '/dynamic-form' | '/static-form'
   fileRoutesById: FileRoutesById
 }
 
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  DynamicFormRoute: typeof DynamicFormRoute
   StaticFormRoute: typeof StaticFormRoute
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  DynamicFormRoute: DynamicFormRoute,
   StaticFormRoute: StaticFormRoute,
 }
 
@@ -97,11 +116,15 @@ export const routeTree = rootRoute
       "filePath": "__root.tsx",
       "children": [
         "/",
+        "/dynamic-form",
         "/static-form"
       ]
     },
     "/": {
       "filePath": "index.tsx"
+    },
+    "/dynamic-form": {
+      "filePath": "dynamic-form.tsx"
     },
     "/static-form": {
       "filePath": "static-form.tsx"
