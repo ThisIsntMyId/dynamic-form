@@ -59,7 +59,7 @@ const sampleFormConfig: IntakeFormConfig = {
     information will be used for medical purposes and will be kept confidential 
     in accordance with HIPAA regulations.
   `,
-  consentSignUrl: "https://dummyimage.com/800x150.png/fff/000&text=#basicInfo.firstName+#basicInfo.lastName",
+  consentSignUrl: "https://dummyimage.com/800x150.png/fff/000&text=[#basicInfo.firstName]+[#basicInfo.lastName]",
 
   pages: [
     {

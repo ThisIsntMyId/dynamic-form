@@ -23,6 +23,10 @@ const PREVIEW_PAGE = '_preview';
 const REVIEW_PAGE = '_review';
 const COMPLETE_PAGE = '_complete';
 
+const LS_USER_RESPONSE = 'intakeForm_userResponse';
+const LS_PAGE_ID = 'intakeForm_currentPageId';
+const LS_PAGE_CODE = 'intakeForm_currentPageCode';
+
 export const DynamicForm: React.FC<DynamicFormProps> = ({
   formConfig,
   userResponse,
@@ -30,8 +34,15 @@ export const DynamicForm: React.FC<DynamicFormProps> = ({
   onStepChange,
   onSubmit
 }) => {
-  // State
-  const [localUserResponse, setLocalUserResponse] = useState<Record<string, Record<string, any>>>(userResponse);
+  // Restore from localStorage if available
+  const getInitialUserResponse = () => {
+    try {
+      const stored = localStorage.getItem(LS_USER_RESPONSE);
+      if (stored) return JSON.parse(stored);
+    } catch {}
+    return userResponse;
+  };
+  const [localUserResponse, setLocalUserResponse] = useState<Record<string, Record<string, any>>>(getInitialUserResponse());
   const [formError, setFormError] = useState<Record<string, Record<string, string>>>({});
   const [consentChecked, setConsentChecked] = useState(false);
   const [consentError, setConsentError] = useState('');
@@ -48,7 +59,9 @@ export const DynamicForm: React.FC<DynamicFormProps> = ({
     const url = new URL(window.location.href);
     const pageParam = url.searchParams.get('page');
     if (pageParam) return pageParam;
-    // If no page param, decide where to go
+    // If no page param, check localStorage for saved page
+    const savedPageCode = localStorage.getItem(LS_PAGE_CODE);
+    if (savedPageCode) return savedPageCode;
     if (formConfig.showPreview) return PREVIEW_PAGE;
     return formConfig.pages[0].code;
   };
@@ -56,6 +69,7 @@ export const DynamicForm: React.FC<DynamicFormProps> = ({
   const currentPageCode = getCurrentStep();
   const currentPage = formConfig.pages.find(page => page.code === currentPageCode);
 
+  // Re-add navigation helpers
   const getNextPage = () => {
     if (!currentPage) return undefined;
     const currentIndex = formConfig.pages.findIndex(page => page.code === currentPage.code);
@@ -63,11 +77,35 @@ export const DynamicForm: React.FC<DynamicFormProps> = ({
   };
 
   const hasNextPage = () => !!getNextPage();
+
   const isLastPage = () => {
     if (!currentPage) return false;
     const currentIndex = formConfig.pages.findIndex(page => page.code === currentPage.code);
     return currentIndex === formConfig.pages.length - 1;
   };
+
+  // On mount, if no ?page= but localStorage has a saved page, redirect
+  useEffect(() => {
+    const url = new URL(window.location.href);
+    const pageParam = url.searchParams.get('page');
+    const savedPageCode = localStorage.getItem(LS_PAGE_CODE);
+    if (!pageParam && savedPageCode) {
+      url.searchParams.set('page', savedPageCode);
+      window.history.replaceState({}, '', url);
+      onStepChange?.(savedPageCode, localUserResponse);
+    }
+  }, []); // Only run on mount
+
+  // Persist userResponse and page info to localStorage on every change
+  useEffect(() => {
+    try {
+      localStorage.setItem(LS_USER_RESPONSE, JSON.stringify(localUserResponse));
+      if (currentPage) {
+        localStorage.setItem(LS_PAGE_ID, String(currentPage.id));
+        localStorage.setItem(LS_PAGE_CODE, currentPage.code);
+      }
+    } catch {}
+  }, [localUserResponse, currentPage]);
 
   // Navigation Handler
   const navigateToStep = (step: string) => {
@@ -106,13 +144,14 @@ export const DynamicForm: React.FC<DynamicFormProps> = ({
     setLocalUserResponse(prev => {
       const pageCode = currentPage?.code;
       if (!pageCode) return prev;
-      return {
+      const updated = {
         ...prev,
         [pageCode]: {
           ...prev[pageCode],
           [questionCode]: value
         }
       };
+      return updated;
     });
   };
 
@@ -162,6 +201,16 @@ export const DynamicForm: React.FC<DynamicFormProps> = ({
     return isValid;
   };
 
+  // On submit, clear localStorage
+  const handleFinalSubmit = (data: Record<string, Record<string, any>>) => {
+    try {
+      localStorage.removeItem(LS_USER_RESPONSE);
+      localStorage.removeItem(LS_PAGE_ID);
+      localStorage.removeItem(LS_PAGE_CODE);
+    } catch {}
+    onSubmit(data);
+  };
+
   // Event Handlers
   const handleNext = () => {
     if (validatePage()) {
@@ -172,7 +221,7 @@ export const DynamicForm: React.FC<DynamicFormProps> = ({
         navigateToStep(REVIEW_PAGE);
       } else {
         // Submit and go to complete
-        onSubmit(localUserResponse);
+        handleFinalSubmit(localUserResponse);
         navigateToStep(COMPLETE_PAGE);
       }
     }
@@ -183,7 +232,7 @@ export const DynamicForm: React.FC<DynamicFormProps> = ({
       if (formConfig.showReview) {
         navigateToStep(REVIEW_PAGE);
       } else {
-        onSubmit(localUserResponse);
+        handleFinalSubmit(localUserResponse);
         navigateToStep(COMPLETE_PAGE);
       }
     }
@@ -349,7 +398,7 @@ export const DynamicForm: React.FC<DynamicFormProps> = ({
                   consentCheckboxRef.current?.focus();
                   return;
                 }
-                onSubmit(localUserResponse);
+                handleFinalSubmit(localUserResponse);
                 navigateToStep(COMPLETE_PAGE);
               }}
               className="btn-submit bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-6 rounded shadow transition"
@@ -428,7 +477,7 @@ export const DynamicForm: React.FC<DynamicFormProps> = ({
             ) : (
               <button 
                 onClick={() => {
-                  onSubmit(localUserResponse);
+                  handleFinalSubmit(localUserResponse);
                   navigateToStep(COMPLETE_PAGE);
                 }}
                 className="btn-submit bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-6 rounded shadow transition"
