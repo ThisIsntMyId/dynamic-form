@@ -11,9 +11,16 @@
 // Import Routes
 
 import { Route as rootRoute } from './routes/__root'
+import { Route as StaticFormImport } from './routes/static-form'
 import { Route as IndexImport } from './routes/index'
 
 // Create/Update Routes
+
+const StaticFormRoute = StaticFormImport.update({
+  id: '/static-form',
+  path: '/static-form',
+  getParentRoute: () => rootRoute,
+} as any)
 
 const IndexRoute = IndexImport.update({
   id: '/',
@@ -32,6 +39,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexImport
       parentRoute: typeof rootRoute
     }
+    '/static-form': {
+      id: '/static-form'
+      path: '/static-form'
+      fullPath: '/static-form'
+      preLoaderRoute: typeof StaticFormImport
+      parentRoute: typeof rootRoute
+    }
   }
 }
 
@@ -39,32 +53,37 @@ declare module '@tanstack/react-router' {
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/static-form': typeof StaticFormRoute
 }
 
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/static-form': typeof StaticFormRoute
 }
 
 export interface FileRoutesById {
   __root__: typeof rootRoute
   '/': typeof IndexRoute
+  '/static-form': typeof StaticFormRoute
 }
 
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths: '/' | '/static-form'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to: '/' | '/static-form'
+  id: '__root__' | '/' | '/static-form'
   fileRoutesById: FileRoutesById
 }
 
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  StaticFormRoute: typeof StaticFormRoute
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  StaticFormRoute: StaticFormRoute,
 }
 
 export const routeTree = rootRoute
@@ -77,11 +96,15 @@ export const routeTree = rootRoute
     "__root__": {
       "filePath": "__root.tsx",
       "children": [
-        "/"
+        "/",
+        "/static-form"
       ]
     },
     "/": {
       "filePath": "index.tsx"
+    },
+    "/static-form": {
+      "filePath": "static-form.tsx"
     }
   }
 }
